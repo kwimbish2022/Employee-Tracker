@@ -1,4 +1,3 @@
--- do we really need this drop??
 DROP DATABASE IF EXISTS employee_trackerDB;
 
 CREATE DATABASE employee_trackerDB;
