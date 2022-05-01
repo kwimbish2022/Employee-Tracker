@@ -125,3 +125,132 @@ function viewEmployeesByDepartment() {
     getDepartment(departmentChoices);
   });
 };
+
+// to get the department
+function getDepartment(departmentChoices) {
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "department",
+      message: "Departments:",
+      choices: departmentChoices
+    }
+  ])
+    .then((res) => {
+    let query = 
+    `SELECT
+      employee.id,
+      employee.first_name,
+      employee.last_name,
+      role.title,
+      department.name
+    FROM employee
+    JOIN role
+      ON employee.role_id = role.id
+    JOIN department
+      ON department.id = role.department_id
+    WHERE department.id = ?`
+  
+    connection.query(query, res.department, (err, res) => {
+    if (err) throw err;
+      firstPrompt();
+      console.table(res);
+    });
+  })
+};
+
+// adding an employee
+function addEmployee() {
+  let query =
+  `SELECT
+    role.id,
+    role.title,
+    role.salary
+  FROM role`
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    const role = res.map(({ id, title, salary }) => ({
+      value: id,
+      title: `${title}`,
+      salary: `${salary}`
+    }));
+
+    console.table(res),
+    employeeRoles(role);
+  });
+};
+
+function employeeRoles(role) {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "Employee first name:"
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "Employee last name:"
+    },    
+    {
+      type: "input",
+      name: "roleId",
+      message: "Employee role:",
+      choices: role
+    }
+  ]).then((res) => {
+    let query = `INSERT INTO employee SET ?`
+    connection.query(query, {
+      first_name: res.firstName,
+      last_name: res.lastName,
+      role_id: res.role_id
+    }, (err, res) => {
+      if (err) throw err;
+      firstPrompt();
+    });
+  });
+}; 
+
+// remove an employee
+function removeEmployee() {
+  let query =
+  `SELECT
+    employee.id,
+    employee.first_name,
+    employee.last_name
+  FROM employee`
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    const employee = res.map(({ id, first_name, last_name }) => ({
+      value: id,
+      name: `${id} ${first_name} ${last_name}`
+    }));
+    console.table(res);
+    getDelete(employee);
+  });
+};
+
+function getDelete(employee) {
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "employee",
+      message: "Employee to be deleted:",
+      choices: employee
+    }
+  ]).then((res) => {
+    let query = `DELETE FROM employee WHERE ?`;
+    connection.query(query, { id: res.employee }, (err, res) => {
+      if (err) throw err;
+      firstPrompt();
+    });
+  });
+};
+
+// update an employee's role
+
+// add a role
+
+// add department
