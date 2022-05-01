@@ -5,10 +5,10 @@ require("console.table");
 // to connect mysql/ connect to port
 const connection = mysql.createConnection({
   host: "localhost",
-  port: "3301",
+  port: "3306",
   // in future/real job use more secure user and pw so no one can see our "Secret stuff"
   user: "root",
-  password: "1234",
+  password: "rtfoSPANI2!",
   database: "employee_trackerDB"
 });
 
@@ -20,9 +20,10 @@ connection.connect(function (err) {
 
 // "choose your own adventure" prompts
 function firstPrompt() {
-  inquirer.prompt({
+  inquirer.prompt([
+  {
     type: "list",
-    name: "task",
+    name: "userChoice",
     message: "What would you like to do?",
     choices: [
       "View Employees",
@@ -34,9 +35,10 @@ function firstPrompt() {
       "Add Department",
       "Exit"
     ]
-  })
-  .then(function ({ task }) {
-    switch (task) {
+  }
+  ]).then((res) => {
+    console.log(res.userChoice)
+    switch (res.userChoice) {
       case "View Employees":
         viewAllEmployees();
         break;
@@ -61,10 +63,16 @@ function firstPrompt() {
         addRole();
         break;
 
+      case "Add Department":
+        addDepartment();
+        break;
+
       case "Exit":
         connection.end();
         break;
-    }
+      }
+  }).catch((err) => {
+    if (err) throw err;
   });
 };
 
@@ -89,12 +97,12 @@ function viewAllEmployees() {
   LEFT JOIN employee manager
     ON manager.id = employee.manager_id`
   
-    connection.query(query, (err, res) => {
-      if (err) throw err;
-      console.table(res);
-      console.log("Viewed employees\n");
-      firstPrompt();
-    });
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    console.log("Viewed employees\n");
+    firstPrompt();
+  });
 };
 
 // view them by department
@@ -135,8 +143,7 @@ function getDepartment(departmentChoices) {
       message: "Departments:",
       choices: departmentChoices
     }
-  ])
-    .then((res) => {
+  ]).then((res) => {
     let query = 
     `SELECT
       employee.id,
@@ -244,6 +251,7 @@ function getDelete(employee) {
     let query = `DELETE FROM employee WHERE ?`;
     connection.query(query, { id: res.employee }, (err, res) => {
       if (err) throw err;
+      console.table(res);
       firstPrompt();
     });
   });
@@ -377,4 +385,20 @@ function addToRole(department) {
     });
   });
 };
+
 // add department
+function addDepartment() {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "Department name: "
+    }
+  ]).then((res) => {
+    let query = `INSERT INTO department SET ?`;
+    connection.query(query, {name: res.name}, (err, res) => {
+      if (err) throw err;
+      firstPrompt();
+    });
+  });
+};
