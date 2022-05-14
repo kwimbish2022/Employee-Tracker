@@ -3,14 +3,17 @@ const inquirer = require("inquirer");
 require("console.table");
 
 // to connect mysql/ connect to port
-const connection = mysql.createConnection({
-  host: "localhost",
-  port: "3306",
-  // in future/real job use more secure user and pw so no one can see our "Secret stuff"
-  user: "root",
-  password: "rtfoSPANI2!",
-  database: "employee_trackerDB"
-});
+const connection = mysql.createConnection(
+    {
+        host: 'localhost',
+        user: "root",
+        password: "rtfoSPANI2!",
+        //   // in future/real job use more secure user and pw so no one can see our "Secret stuff"
+        database: "employee_trackerDB"
+    },
+    console.log('Connected to the employee_trackerDB')
+);
+
 
 connection.connect(function (err) {
   if (err) throw err;
@@ -202,7 +205,7 @@ function employeeRoles(role) {
     },    
     {
       type: "input",
-      name: "roleId",
+      name: "role_id",
       message: "Employee role:",
       choices: role
     }
@@ -268,11 +271,11 @@ function updateEmployeeRole() {
       role.salary,
       CONCAT(manager.first_name, ' ', manager.last_name) AS manager
     FROM employee
-    JOIN role
+    LEFT JOIN role
       ON employee.role_id = role.id
-    JOIN department
+    LEFT JOIN department
       ON department.id = role.department_id
-    JOIN employee manager
+    LEFT JOIN employee manager
       ON manager.id = employee.manager_id`
 
   connection.query(query, (err, res) => {
@@ -322,7 +325,7 @@ function getUpdatedRole(employee, roleChoices) {
     },
   ]).then((res) => {
     let query = `UPDATE employee SET role_id = ? WHERE id = ?`
-    connections.query(query, [ res.role, res.employee], (err, res) => {
+    connection.query(query, [ res.role, res.employee], (err, res) => {
       if (err) throw err;
       firstPrompt();
     });
