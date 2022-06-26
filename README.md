@@ -22,11 +22,7 @@ Clone the repo from Github and make sure to download the appropriate items (ex r
 
 ## Usage
 
-<!-- https://kwimbish2022-note-taker.herokuapp.com/
-
-<img src="https://github.com/kwimbish2022/Note-Taker/blob/main/public/assets/Screenshot2.png" >
-
-<img src="https://github.com/kwimbish2022/Note-Taker/blob/main/public/assets/Screenshot1.png" > -->
+https://drive.google.com/file/d/1g3A1dIRuilBAtgtqFIKV8MuyIBx83u2f/view
 
 ## License
 MIT
